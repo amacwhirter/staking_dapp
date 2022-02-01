@@ -1,10 +1,11 @@
-import logo from './logo.svg';
 import './App.css';
 import Web3 from 'web3';
-import TetherToken from './build/Tether_Token.json';
-import DummyToken from './build/Dummy_Token.json';
-import StakingDapp from './build/Staking_Dapp.json';
-import {Component, useEffect, useState} from "react";
+import TetherToken from '../build/Tether_Token.json';
+import DummyToken from '../build/Dummy_Token.json';
+import StakingDapp from '../build/Staking_Dapp.json';
+import {useEffect, useState} from "react";
+import Navbar from "./Navbar";
+import Main from "./Main";
 
 export const App = (props) => {
   const [account, setAccount] = useState('0x0');
@@ -27,7 +28,7 @@ export const App = (props) => {
 
   const loadBlockchainData = async () => {
     const web3 = window.web3;
-    const accounts = await web3.eth.getAccount();
+    const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
 
     const networkId = await web3.eth.net.getId();
@@ -36,6 +37,7 @@ export const App = (props) => {
     const StakingDappData = StakingDapp.networks[networkId];
 
     if (TetherTokenData) {
+      console.log('IN HERE 1!')
       const tetherToken = new web3.eth.Contract(TetherToken.abi, TetherTokenData.address)
       setTetherToken(tetherToken);
       let tetherTokenBalance = await tetherToken.methods.balance(account).call();
@@ -43,13 +45,17 @@ export const App = (props) => {
     }
 
     if (DummyTokenData) {
-      const dummyToken = new web3.eth.Contract(DummyToken.abi, DummyTokenData.address)
+      console.log('IN HERE 2!')
+
+      const newDummyToken = new web3.eth.Contract(DummyToken.abi, DummyTokenData.address)
       setDummyToken(dummyToken);
-      let dummyTokenBalance = await dummyToken.methods.balance(account).call();
+      let dummyTokenBalance = await newDummyToken.methods.balance(account).call();
       setDummyTokenBalance(dummyTokenBalance.toString());
     }
 
     if (StakingDappData) {
+      console.log('IN HERE 3!')
+
       const newStakingDapp = new web3.eth.Contract(StakingDapp.abi, StakingDappData.address)
       setStakingDapp(newStakingDapp);
       let stakingDappBalance = await stakingDapp.methods.stakingBalance(account).call();
@@ -73,6 +79,7 @@ export const App = (props) => {
     setLoading(true);
     tetherToken.methods.approve(stakingDapp.address, amount).send({from: account}).on("transactionHash", (hash) => {
       stakingDapp.methods.stakeTokens(amount).send({from: account}).on("transactionHash", (hash) => {
+        console.log('IN HERE!!!')
         setLoading(false);
       })
     });
@@ -81,26 +88,41 @@ export const App = (props) => {
   const unstakeTokens = (amount) => {
     setLoading(true);
     stakingDapp.methods.unstakeTokens(amount).send({from: account}).on("transactionHash", (hash) => {
+      console.log('IN HERE 2!!!')
       setLoading(false);
     })
   }
 
+  let content
+  if(!loading){
+    content = <p id='loader' className="text-center">Loading...</p>
+  } else{
+    content = <Main
+      tetherTokenBalance = {tetherTokenBalance}
+      dummyTokenBalance = {dummyTokenBalance}
+      stakingDappBalance = {stakingDappBalance}
+      stakeTokens={stakeTokens}
+      unstakeTokens = {unstakeTokens}
+    />
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo"/>
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar account={account}/>
+      <div className="container-fluid mt-5">
+        <div className="row">
+          <main role="main" className="col-lg-12 ml-auto mr-auto" style={{ maxWidth: '600px' }}>
+            <div className="content mr-auto ml-auto">
+              <a
+                href="https://www.blockchain-council.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+              </a>
+              {content}
+            </div>
+          </main>
+        </div>
+      </div>
     </div>
   )
 }
