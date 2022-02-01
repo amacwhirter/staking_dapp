@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity <=0.4.22 <0.9.0;
+pragma solidity = 0.8.11;
 
-contract Dummy {
+contract Dummy_Token {
 
     string public name = "dummy token";
     string public symbol = "dum token";
@@ -46,8 +46,8 @@ contract Dummy {
         require(_value <= allowance[_from][msg.sender]);
         balance[_from] -= _value;
         balance[_to] += _value;
-        allowance[_from][msg.sender] -= +value;
-        emit transfer(_from, _to, _value);
+        allowance[_from][msg.sender] -= _value;
+        emit Transfer(_from, _to, _value);
         return true;
     }
 }

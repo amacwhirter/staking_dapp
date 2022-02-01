@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity <=0.4.22 <0.9.0;
+pragma solidity = 0.8.11;
 
 import "./Dummy_Token.sol";
 import "./Tether_Token.sol";
@@ -8,15 +8,15 @@ contract Staking_Dapp {
 
     string public name = "Staking Dapp";
     address public owner;
-    Dummy public dummy_token;
-    Tether public tether_token;
+    Dummy_Token public dummy_token;
+    Tether_Token public tether_token;
 
     address[] public stakers;
     mapping(address => uint) public stakingBalance;
     mapping(address => bool) public hasstaked;
     mapping(address => bool) public isstaking;
 
-    constructor(Dummy _dummyToken, Tether _tetherToken) public {
+    constructor(Dummy_Token _dummyToken, Tether_Token _tetherToken) public {
         dummy_token = _dummyToken;
         tether_token = _tetherToken;
         owner = msg.sender;
@@ -26,7 +26,7 @@ contract Staking_Dapp {
         // check if amount is zero or not
         require(_amount > 0, "Amount can not be zero.");
         // transferred to tether contract address
-        tether_token.transfer(msg.sender, address(this), _amount);
+        tether_token.transferfrom(msg.sender, address(this), _amount);
         // updated staking balance of user
         stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
 
