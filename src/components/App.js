@@ -6,6 +6,7 @@ import StakingDapp from '../build/Staking_Dapp.json';
 import {useEffect, useState} from "react";
 import Navbar from "./Navbar";
 import Main from "./Main";
+import {Grid} from '@mui/material';
 
 export const App = (props) => {
   const [account, setAccount] = useState('0x0');
@@ -15,7 +16,7 @@ export const App = (props) => {
   const [dummyTokenBalance, setDummyTokenBalance] = useState('0');
   const [stakingDapp, setStakingDapp] = useState({});
   const [stakingDappBalance, setStakingDappBalance] = useState('0');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initialLoad = async () => {
@@ -35,6 +36,8 @@ export const App = (props) => {
     const TetherTokenData = TetherToken.networks[networkId];
     const DummyTokenData = DummyToken.networks[networkId];
     const StakingDappData = StakingDapp.networks[networkId];
+
+    console.log(TetherToken, networkId)
 
     if (TetherTokenData) {
       console.log('IN HERE 1!')
@@ -69,6 +72,7 @@ export const App = (props) => {
       window.web3 = new Web3(window.ethereum);
       await window.ethereum.enable();
     } else if (window.web3) {
+      console.log('HI3!')
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
       window.alert("Non-Ethereum browser detected. you should consider trying Metamask!");
@@ -94,7 +98,7 @@ export const App = (props) => {
   }
 
   let content
-  if(!loading){
+  if(loading){
     content = <p id='loader' className="text-center">Loading...</p>
   } else{
     content = <Main
@@ -108,21 +112,9 @@ export const App = (props) => {
   return (
     <div className="App">
       <Navbar account={account}/>
-      <div className="container-fluid mt-5">
-        <div className="row">
-          <main role="main" className="col-lg-12 ml-auto mr-auto" style={{ maxWidth: '600px' }}>
-            <div className="content mr-auto ml-auto">
-              <a
-                href="https://www.blockchain-council.org/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-              </a>
-              {content}
-            </div>
-          </main>
-        </div>
-      </div>
+      <Grid>
+        {content}
+      </Grid>
     </div>
   )
 }
